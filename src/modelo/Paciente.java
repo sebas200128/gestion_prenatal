@@ -158,7 +158,7 @@ public class Paciente {
         }
     }
 
-    // Método para registrar paciente en la base de datos
+    // Método para registrar paciente en la base de datos = Franco
     public boolean registrar() {
         String query = "INSERT INTO pacientes (id, nombre, edad, dni, telefono, direccion, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
         ConexionBD conexionBD = new ConexionBD("project_prenatal");

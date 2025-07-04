@@ -18,8 +18,6 @@ public class Cita {
 
     public Cita() {
     }
-    
-    
 
     public boolean registrar() {
         String sql = "INSERT INTO citas (paciente_id, fecha, hora) VALUES (?, ?, ?)";
@@ -79,6 +77,5 @@ public class Cita {
     public void setHora(String hora) {
         this.hora = hora;
     }
-    
-    
+
 }

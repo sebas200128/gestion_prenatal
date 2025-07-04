@@ -1,6 +1,7 @@
 package modelo;
 
 import base_datos.ConexionBD;
+import base_datos.utilidades.GestorConsultas;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +21,12 @@ public class RegistroCardiaco {
     private double altura;
     private String observaciones;
 
-    // Constructor vacío
     public RegistroCardiaco() {
     }
 
-    // Constructor completo
     public RegistroCardiaco(int id, int pacienteId, String fecha, String hora,
-            String presionArterial, int frecuenciaCardiaca,
-            int frecuenciaRespiratoria, double temperatura,
-            int saturacionOxigeno, double peso, double altura,
-            String observaciones) {
+            String presionArterial, int frecuenciaCardiaca, int frecuenciaRespiratoria,
+            double temperatura, int saturacionOxigeno, double peso, double altura, String observaciones) {
         this.id = id;
         this.pacienteId = pacienteId;
         this.fecha = fecha;
@@ -44,127 +41,109 @@ public class RegistroCardiaco {
         this.observaciones = observaciones;
     }
 
-    // Getters
+    // Getters y Setters
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getPacienteId() {
         return pacienteId;
     }
 
-    public String getFecha() {
-        return fecha;
-    }
-
-    public String getHora() {
-        return hora;
-    }
-
-    public String getPresionArterial() {
-        return presionArterial;
-    }
-
-    public int getFrecuenciaCardiaca() {
-        return frecuenciaCardiaca;
-    }
-
-    public int getFrecuenciaRespiratoria() {
-        return frecuenciaRespiratoria;
-    }
-
-    public double getTemperatura() {
-        return temperatura;
-    }
-
-    public int getSaturacionOxigeno() {
-        return saturacionOxigeno;
-    }
-
-    public double getPeso() {
-        return peso;
-    }
-
-    public double getAltura() {
-        return altura;
-    }
-
-    public String getObservaciones() {
-        return observaciones;
-    }
-
-    // Setters
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setPacienteId(int pacienteId) {
         this.pacienteId = pacienteId;
+    }
+
+    public String getFecha() {
+        return fecha;
     }
 
     public void setFecha(String fecha) {
         this.fecha = fecha;
     }
 
+    public String getHora() {
+        return hora;
+    }
+
     public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    public String getPresionArterial() {
+        return presionArterial;
     }
 
     public void setPresionArterial(String presionArterial) {
         this.presionArterial = presionArterial;
     }
 
+    public int getFrecuenciaCardiaca() {
+        return frecuenciaCardiaca;
+    }
+
     public void setFrecuenciaCardiaca(int frecuenciaCardiaca) {
         this.frecuenciaCardiaca = frecuenciaCardiaca;
+    }
+
+    public int getFrecuenciaRespiratoria() {
+        return frecuenciaRespiratoria;
     }
 
     public void setFrecuenciaRespiratoria(int frecuenciaRespiratoria) {
         this.frecuenciaRespiratoria = frecuenciaRespiratoria;
     }
 
+    public double getTemperatura() {
+        return temperatura;
+    }
+
     public void setTemperatura(double temperatura) {
         this.temperatura = temperatura;
+    }
+
+    public int getSaturacionOxigeno() {
+        return saturacionOxigeno;
     }
 
     public void setSaturacionOxigeno(int saturacionOxigeno) {
         this.saturacionOxigeno = saturacionOxigeno;
     }
 
+    public double getPeso() {
+        return peso;
+    }
+
     public void setPeso(double peso) {
         this.peso = peso;
+    }
+
+    public double getAltura() {
+        return altura;
     }
 
     public void setAltura(double altura) {
         this.altura = altura;
     }
 
+    public String getObservaciones() {
+        return observaciones;
+    }
+
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
 
-    // Métodos heredados para compatibilidad
-    public String getPresion() {
-        return presionArterial;
-    }
-
-    public int getFrecuencia() {
-        return frecuenciaCardiaca;
-    }
-
-    public void setPresion(String presion) {
-        this.presionArterial = presion;
-    }
-
-    public void setFrecuencia(int frecuencia) {
-        this.frecuenciaCardiaca = frecuencia;
-    }
-
-    // Buscar por ID
     public static RegistroCardiaco buscarPorId(int id) {
         RegistroCardiaco registro = null;
-        try (Connection conn = new ConexionBD("project_prenatal").conectar()) {
-            String sql = "SELECT * FROM signos_vitales WHERE id = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
+        String sql = GestorConsultas.obtenerConsulta("consulta.buscar_signos_vitales_por_id");
+
+        try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -183,152 +162,69 @@ public class RegistroCardiaco {
                 registro.setAltura(rs.getDouble("altura"));
                 registro.setObservaciones(rs.getString("observaciones"));
             }
-        } catch (Exception e) {
-            System.err.println("Error al buscar registro: " + e.getMessage());
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return registro;
     }
 
-    // Obtener todos los registros
     public static List<RegistroCardiaco> obtenerTodos() {
         List<RegistroCardiaco> lista = new ArrayList<>();
-        String sql = "SELECT * FROM signos_vitales ORDER BY id DESC";
+        String sql = GestorConsultas.obtenerConsulta("consulta.obtener_todos_signos_vitales");
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                RegistroCardiaco registro = new RegistroCardiaco();
-                registro.setId(rs.getInt("id"));
-                registro.setPacienteId(rs.getInt("paciente_id"));
-                registro.setFecha(rs.getString("fecha"));
-                registro.setHora(rs.getString("hora"));
-                registro.setPresionArterial(rs.getString("presion_arterial"));
-                registro.setFrecuenciaCardiaca(rs.getInt("frecuencia_cardiaca"));
-                registro.setFrecuenciaRespiratoria(rs.getInt("frecuencia_respiratoria"));
-                registro.setTemperatura(rs.getDouble("temperatura"));
-                registro.setSaturacionOxigeno(rs.getInt("saturacion_oxigeno"));
-                registro.setPeso(rs.getDouble("peso"));
-                registro.setAltura(rs.getDouble("altura"));
-                registro.setObservaciones(rs.getString("observaciones"));
-                lista.add(registro);
+                RegistroCardiaco reg = new RegistroCardiaco(
+                        rs.getInt("id"),
+                        rs.getInt("paciente_id"),
+                        rs.getString("fecha"),
+                        rs.getString("hora"),
+                        rs.getString("presion_arterial"),
+                        rs.getInt("frecuencia_cardiaca"),
+                        rs.getInt("frecuencia_respiratoria"),
+                        rs.getDouble("temperatura"),
+                        rs.getInt("saturacion_oxigeno"),
+                        rs.getDouble("peso"),
+                        rs.getDouble("altura"),
+                        rs.getString("observaciones")
+                );
+                lista.add(reg);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener registros: " + e.getMessage());
             e.printStackTrace();
         }
+
         return lista;
     }
 
-    // Editar un campo específico
     public boolean editar(String campo, String nuevoValor) {
-        String columnaDB = mapearCampoAColumna(campo);
-        String sql = "UPDATE signos_vitales SET " + columnaDB + " = ? WHERE id = ?";
+        String sql = GestorConsultas.obtenerConsultaFormateada("consulta.editar_signo_vital", campo);
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-            // Establecer el valor según el tipo de campo
-            switch (campo) {
-                case "frecuencia_cardiaca":
-                case "frecuencia_respiratoria":
-                case "saturacion_oxigeno":
-                    ps.setInt(1, Integer.parseInt(nuevoValor));
-                    break;
-                case "temperatura":
-                case "peso":
-                case "altura":
-                    ps.setDouble(1, Double.parseDouble(nuevoValor));
-                    break;
-                default:
-                    ps.setString(1, nuevoValor);
-                    break;
+            if (campo.equals("frecuencia_cardiaca") || campo.equals("frecuencia_respiratoria") || campo.equals("saturacion_oxigeno")) {
+                ps.setInt(1, Integer.parseInt(nuevoValor));
+            } else if (campo.equals("temperatura") || campo.equals("peso") || campo.equals("altura")) {
+                ps.setDouble(1, Double.parseDouble(nuevoValor));
+            } else {
+                ps.setString(1, nuevoValor);
             }
+
             ps.setInt(2, this.id);
-
-            boolean resultado = ps.executeUpdate() > 0;
-
-            // Actualizar el objeto actual si la operación fue exitosa
-            if (resultado) {
-                actualizarCampoLocal(campo, nuevoValor);
-            }
-
-            return resultado;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException | NumberFormatException e) {
-            System.err.println("Error al editar registro: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    // Mapear nombres de campos del formulario a nombres de columnas de la BD
-    private String mapearCampoAColumna(String campo) {
-        switch (campo) {
-            case "presion_arterial":
-                return "presion_arterial";
-            case "frecuencia_cardiaca":
-                return "frecuencia_cardiaca";
-            case "frecuencia_respiratoria":
-                return "frecuencia_respiratoria";
-            case "temperatura":
-                return "temperatura";
-            case "saturacion_oxigeno":
-                return "saturacion_oxigeno";
-            case "peso":
-                return "peso";
-            case "altura":
-                return "altura";
-            case "observaciones":
-                return "observaciones";
-            case "fecha":
-                return "fecha";
-            case "hora":
-                return "hora";
-            default:
-                return campo;
-        }
-    }
-
-    // Actualizar campo local después de edición exitosa
-    private void actualizarCampoLocal(String campo, String nuevoValor) {
-        switch (campo) {
-            case "presion_arterial":
-                this.presionArterial = nuevoValor;
-                break;
-            case "frecuencia_cardiaca":
-                this.frecuenciaCardiaca = Integer.parseInt(nuevoValor);
-                break;
-            case "frecuencia_respiratoria":
-                this.frecuenciaRespiratoria = Integer.parseInt(nuevoValor);
-                break;
-            case "temperatura":
-                this.temperatura = Double.parseDouble(nuevoValor);
-                break;
-            case "saturacion_oxigeno":
-                this.saturacionOxigeno = Integer.parseInt(nuevoValor);
-                break;
-            case "peso":
-                this.peso = Double.parseDouble(nuevoValor);
-                break;
-            case "altura":
-                this.altura = Double.parseDouble(nuevoValor);
-                break;
-            case "observaciones":
-                this.observaciones = nuevoValor;
-                break;
-            case "fecha":
-                this.fecha = nuevoValor;
-                break;
-            case "hora":
-                this.hora = nuevoValor;
-                break;
-        }
-    }
-
-    // Eliminar registro
     public boolean eliminar() {
-        String sql = "DELETE FROM signos_vitales WHERE id = ?";
+        String sql = GestorConsultas.obtenerConsulta("consulta.eliminar_signo_vital");
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -336,7 +232,6 @@ public class RegistroCardiaco {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar registro: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

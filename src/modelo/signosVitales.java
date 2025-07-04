@@ -1,6 +1,7 @@
 package modelo;
 
 import base_datos.ConexionBD;
+import base_datos.utilidades.GestorConsultas;
 import java.sql.*;
 
 public class signosVitales {
@@ -35,8 +36,9 @@ public class signosVitales {
     }
 
     public boolean registrar() {
-        String sql = "INSERT INTO signos_vitales (paciente_id, fecha, hora, presion_arterial, frecuencia_cardiaca, frecuencia_respiratoria, temperatura, saturacion_oxigeno, peso, altura, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = GestorConsultas.obtenerConsulta("consulta.insertar_signos");
         ConexionBD conexionBD = new ConexionBD("project_prenatal");
+
         try (Connection conn = conexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pacienteId);
             ps.setString(2, fecha);

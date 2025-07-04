@@ -11,13 +11,13 @@
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmEditarDatos.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/Cita.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmrPrograma.java</file>
-            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/signosVitales.java</file>
-            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorSignosVitales.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorPaciente.java</file>
-            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/RegistroCardiaco.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorSignosVitales.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/Controlador.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmLogin.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmRegistroCardiaco.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorCita.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/Paciente.java</file>
         </group>
     </open-files>
 </project-private>

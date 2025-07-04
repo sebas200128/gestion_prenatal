@@ -18,7 +18,6 @@ public class ConexionBD {
     public ConexionBD(String bd) {
         this.bd = bd;
     }
-
     public Connection conectar() {
         try {
             Class.forName(driver);

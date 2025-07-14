@@ -1,6 +1,6 @@
 package modelo;
 
-import base_datos.ConexionBD;
+import sql.ConexionBD;
 import base_datos.utilidades.GestorConsultas;
 import java.sql.*;
 

@@ -5,26 +5,32 @@ import java.util.Properties;
 
 public class GestorConsultas {
 
-    private static Properties propiedades = new Properties();
+    private static final Properties propiedades = new Properties();
+    private static final String ARCHIVO = "sql/consultas.properties.sql";
 
     static {
-        try (InputStream input = GestorConsultas.class.getClassLoader().getResourceAsStream("sql/consultas.properties")) {
-            if (input != null) {
-                propiedades.load(input);
-            } else {
-                System.err.println("No se encontró el archivo consultas.properties");
+        try (InputStream input = GestorConsultas.class.getClassLoader().getResourceAsStream(ARCHIVO)) {
+            if (input == null) {
+                throw new RuntimeException("Archivo no encontrado: " + ARCHIVO);
             }
+            propiedades.load(input);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error cargando consultas SQL", e);
         }
     }
 
     public static String obtenerConsulta(String clave) {
-        return propiedades.getProperty(clave);
+        System.out.println("Buscando consulta: " + clave); // Debug
+        String consulta = propiedades.getProperty(clave);
+        if (consulta == null) {
+            System.err.println("Consultas disponibles: " + propiedades.stringPropertyNames()); // Debug
+            throw new IllegalArgumentException("Consulta no encontrada: " + clave);
+        }
+        return consulta.trim();
     }
 
     public static String obtenerConsultaFormateada(String clave, String campo) {
-        String consulta = propiedades.getProperty(clave);
-        return consulta != null ? consulta.replace("{campo}", campo) : null;
+        String consulta = obtenerConsulta(clave);
+        return consulta.replace("{campo}", campo);
     }
 }

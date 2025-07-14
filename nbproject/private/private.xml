@@ -5,16 +5,21 @@
         <group>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmPrincipal.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmRegistroPacientes.java</file>
-            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/base_datos/ConexionBD.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmDetallePacientes.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/base_datos/utilidades/GestorConsultas.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmEditarRegistroCardiaco.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmEditarDatos.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/Cita.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmrPrograma.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/sql/ConexionBD.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorPaciente.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorSignosVitales.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/signosVitales.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/sql/scripts.sql</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/RegistroCardiaco.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/Controlador.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmLogin.java</file>
+            <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/sql/consultas.properties.sql</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/vista/frmRegistroCardiaco.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/controller/ControladorCita.java</file>
             <file>file:/C:/Users/user/Downloads/beta/JavaApplication2/src/modelo/Paciente.java</file>

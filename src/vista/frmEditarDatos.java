@@ -4,7 +4,7 @@
  */
 package vista;
 
-import base_datos.ConexionBD;
+import sql.ConexionBD;
 import com.sun.jdi.connect.spi.Connection;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;

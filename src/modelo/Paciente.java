@@ -1,10 +1,8 @@
 package modelo;
 
-import base_datos.ConexionBD;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import base_datos.utilidades.GestorConsultas;
+import sql.ConexionBD;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -38,47 +36,27 @@ public class Paciente {
     // Método para buscar paciente por ID
     public static Paciente buscarPorId(int id) {
         Paciente paciente = null;
-        String query = "SELECT * FROM pacientes WHERE id = ?";
-        ConexionBD conexionBD = new ConexionBD("project_prenatal");
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        String sql = GestorConsultas.obtenerConsulta("consulta.buscar_paciente_por_id");
 
-        try {
-            conn = conexionBD.conectar();
-            if (conn != null) {
-                pstmt = conn.prepareStatement(query);
-                pstmt.setInt(1, id);
-                rs = pstmt.executeQuery();
+        try (Connection conn = new ConexionBD("project_prenatal").conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                if (rs.next()) {
-                    paciente = new Paciente(
-                            rs.getInt("id"),
-                            rs.getString("nombre"),
-                            rs.getInt("edad"),
-                            rs.getString("dni"),
-                            rs.getString("telefono"),
-                            rs.getString("direccion"),
-                            rs.getString("email")
-                    );
-                }
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                paciente = new Paciente(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getInt("edad"),
+                        rs.getString("dni"),
+                        rs.getString("telefono"),
+                        rs.getString("direccion"),
+                        rs.getString("email")
+                );
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar paciente por ID: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            // Cerrar recursos en orden inverso
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
-            conexionBD.desconectar();
         }
         return paciente;
     }
@@ -91,45 +69,29 @@ public class Paciente {
             return false;
         }
 
-        String query = "UPDATE pacientes SET " + campo + " = ? WHERE id = ?";
-        ConexionBD conexionBD = new ConexionBD("project_prenatal");
-        Connection conn = null;
-        PreparedStatement pstmt = null;
+        String sql = GestorConsultas.obtenerConsultaFormateada("consulta.editar_paciente", campo);
         boolean exito = false;
 
-        try {
-            conn = conexionBD.conectar();
-            if (conn != null) {
-                pstmt = conn.prepareStatement(query);
+        try (Connection conn = new ConexionBD("project_prenatal").conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                // Manejar diferentes tipos de datos
-                if ("edad".equals(campo)) {
-                    pstmt.setInt(1, Integer.parseInt(nuevoValor));
-                } else {
-                    pstmt.setString(1, nuevoValor);
-                }
-                pstmt.setInt(2, this.id);
+            // Manejar diferentes tipos de datos
+            if ("edad".equals(campo)) {
+                pstmt.setInt(1, Integer.parseInt(nuevoValor));
+            } else {
+                pstmt.setString(1, nuevoValor);
+            }
+            pstmt.setInt(2, this.id);
 
-                int filasAfectadas = pstmt.executeUpdate();
-                exito = filasAfectadas > 0;
+            int filasAfectadas = pstmt.executeUpdate();
+            exito = filasAfectadas > 0;
 
-                // Actualizar el campo en el objeto actual
-                if (exito) {
-                    actualizarCampoLocal(campo, nuevoValor);
-                }
+            // Actualizar el campo en el objeto actual
+            if (exito) {
+                actualizarCampoLocal(campo, nuevoValor);
             }
         } catch (SQLException | NumberFormatException e) {
             System.err.println("Error al editar paciente: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar PreparedStatement: " + e.getMessage());
-            }
-            conexionBD.desconectar();
         }
         return exito;
     }
@@ -158,41 +120,26 @@ public class Paciente {
         }
     }
 
-    // Método para registrar paciente en la base de datos = Franco
+    // Método para registrar paciente en la base de datos
     public boolean registrar() {
-        String query = "INSERT INTO pacientes (id, nombre, edad, dni, telefono, direccion, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        ConexionBD conexionBD = new ConexionBD("project_prenatal");
-        Connection conn = null;
-        PreparedStatement pstmt = null;
+        String sql = GestorConsultas.obtenerConsulta("consulta.insertar_paciente");
         boolean exito = false;
 
-        try {
-            conn = conexionBD.conectar();
-            if (conn != null) {
-                pstmt = conn.prepareStatement(query);
-                pstmt.setInt(1, this.id);
-                pstmt.setString(2, this.nombre);
-                pstmt.setInt(3, this.edad);
-                pstmt.setString(4, this.dni);
-                pstmt.setString(5, this.telefono);
-                pstmt.setString(6, this.direccion);
-                pstmt.setString(7, this.email);
+        try (Connection conn = new ConexionBD("project_prenatal").conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                int filasAfectadas = pstmt.executeUpdate();
-                exito = filasAfectadas > 0;
-            }
+            pstmt.setInt(1, this.id);
+            pstmt.setString(2, this.nombre);
+            pstmt.setInt(3, this.edad);
+            pstmt.setString(4, this.dni);
+            pstmt.setString(5, this.telefono);
+            pstmt.setString(6, this.direccion);
+            pstmt.setString(7, this.email);
+
+            int filasAfectadas = pstmt.executeUpdate();
+            exito = filasAfectadas > 0;
         } catch (SQLException e) {
             System.err.println("Error al registrar paciente: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar PreparedStatement: " + e.getMessage());
-            }
-            conexionBD.desconectar();
         }
         return exito;
     }
@@ -200,152 +147,81 @@ public class Paciente {
     // Método para obtener todos los pacientes
     public static List<Paciente> obtenerTodos() {
         List<Paciente> pacientes = new ArrayList<>();
-        String query = "SELECT * FROM pacientes";
-        ConexionBD conexionBD = new ConexionBD("project_prenatal");
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        String sql = GestorConsultas.obtenerConsulta("consulta.obtener_todos_pacientes");
 
-        try {
-            conn = conexionBD.conectar();
-            if (conn != null) {
-                pstmt = conn.prepareStatement(query);
-                rs = pstmt.executeQuery();
+        try (Connection conn = new ConexionBD("project_prenatal").conectar(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
-                while (rs.next()) {
-                    Paciente paciente = new Paciente(
-                            rs.getInt("id"),
-                            rs.getString("nombre"),
-                            rs.getInt("edad"),
-                            rs.getString("dni"),
-                            rs.getString("telefono"),
-                            rs.getString("direccion"),
-                            rs.getString("email")
-                    );
-                    pacientes.add(paciente);
-                }
+            while (rs.next()) {
+                Paciente paciente = new Paciente(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getInt("edad"),
+                        rs.getString("dni"),
+                        rs.getString("telefono"),
+                        rs.getString("direccion"),
+                        rs.getString("email")
+                );
+                pacientes.add(paciente);
             }
         } catch (SQLException e) {
             System.err.println("Error al obtener todos los pacientes: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
-            conexionBD.desconectar();
         }
         return pacientes;
     }
 
-    // Método para eliminar paciente
     // Método para eliminar paciente y sus registros relacionados
     public boolean eliminar() {
-        ConexionBD conexionBD = new ConexionBD("project_prenatal");
-        Connection conn = null;
         boolean exito = false;
+        String sqlEliminarRegistros = GestorConsultas.obtenerConsulta("consulta.eliminar_registros_paciente");
+        String sqlEliminarPaciente = GestorConsultas.obtenerConsulta("consulta.eliminar_paciente");
 
-        try {
-            conn = conexionBD.conectar();
-            if (conn != null) {
-                // Iniciar transacción
-                conn.setAutoCommit(false);
+        try (Connection conn = new ConexionBD("project_prenatal").conectar()) {
+            // Iniciar transacción
+            conn.setAutoCommit(false);
 
-                // Primero eliminar los registros relacionados en registro_cambios
-                String queryRegistros = "DELETE FROM registro_cambios WHERE paciente_id = ?";
-                try (PreparedStatement pstmtRegistros = conn.prepareStatement(queryRegistros)) {
-                    pstmtRegistros.setInt(1, this.id);
-                    int registrosEliminados = pstmtRegistros.executeUpdate();
-                    System.out.println("Registros relacionados eliminados: " + registrosEliminados);
-                }
+            // Primero eliminar los registros relacionados
+            try (PreparedStatement pstmtRegistros = conn.prepareStatement(sqlEliminarRegistros)) {
+                pstmtRegistros.setInt(1, this.id);
+                pstmtRegistros.executeUpdate();
+            }
 
-                // Luego eliminar el paciente
-                String queryPaciente = "DELETE FROM pacientes WHERE id = ?";
-                try (PreparedStatement pstmtPaciente = conn.prepareStatement(queryPaciente)) {
-                    pstmtPaciente.setInt(1, this.id);
-                    int pacientesEliminados = pstmtPaciente.executeUpdate();
+            // Luego eliminar el paciente
+            try (PreparedStatement pstmtPaciente = conn.prepareStatement(sqlEliminarPaciente)) {
+                pstmtPaciente.setInt(1, this.id);
+                int filasAfectadas = pstmtPaciente.executeUpdate();
 
-                    if (pacientesEliminados > 0) {
-                        // Confirmar transacción
-                        conn.commit();
-                        exito = true;
-                        System.out.println("Paciente con ID " + this.id + " eliminado exitosamente junto con sus registros.");
-                    } else {
-                        // Revertir transacción
-                        conn.rollback();
-                        System.out.println("No se encontró ningún paciente con ID " + this.id);
-                    }
+                if (filasAfectadas > 0) {
+                    conn.commit();
+                    exito = true;
+                } else {
+                    conn.rollback();
                 }
             }
         } catch (SQLException e) {
             System.err.println("Error al eliminar paciente: " + e.getMessage());
             e.printStackTrace();
-
-            // Revertir transacción en caso de error
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                    System.out.println("Transacción revertida debido a error.");
-                } catch (SQLException rollbackEx) {
-                    System.err.println("Error al revertir transacción: " + rollbackEx.getMessage());
-                }
-            }
-        } finally {
-            // Restaurar autoCommit y cerrar conexión
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                } catch (SQLException e) {
-                    System.err.println("Error al restaurar autoCommit: " + e.getMessage());
-                }
-            }
-            conexionBD.desconectar();
         }
         return exito;
     }
 
-// Método alternativo para verificar si un paciente tiene registros relacionados
+    // Método alternativo para verificar si un paciente tiene registros relacionados
     public boolean tieneRegistrosRelacionados() {
-        String query = "SELECT COUNT(*) FROM registro_cambios WHERE paciente_id = ?";
-        ConexionBD conexionBD = new ConexionBD("project_prenatal");
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        String sql = GestorConsultas.obtenerConsulta("consulta.contar_registros_paciente");
         boolean tieneRegistros = false;
 
-        try {
-            conn = conexionBD.conectar();
-            if (conn != null) {
-                pstmt = conn.prepareStatement(query);
-                pstmt.setInt(1, this.id);
-                rs = pstmt.executeQuery();
+        try (Connection conn = new ConexionBD("project_prenatal").conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                if (rs.next()) {
-                    int count = rs.getInt(1);
-                    tieneRegistros = count > 0;
-                }
+            pstmt.setInt(1, this.id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                tieneRegistros = count > 0;
             }
         } catch (SQLException e) {
             System.err.println("Error al verificar registros relacionados: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
-            conexionBD.desconectar();
         }
         return tieneRegistros;
     }

@@ -1,6 +1,7 @@
 package modelo;
 
-import base_datos.ConexionBD;
+import base_datos.utilidades.GestorConsultas;
+import sql.ConexionBD;
 import java.sql.*;
 
 public class Cita {
@@ -20,13 +21,16 @@ public class Cita {
     }
 
     public boolean registrar() {
-        String sql = "INSERT INTO citas (paciente_id, fecha, hora) VALUES (?, ?, ?)";
+        String sql = GestorConsultas.obtenerConsulta("consulta.insertar_cita");
         ConexionBD conexionBD = new ConexionBD("project_prenatal");
+
         try (Connection conn = conexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, pacienteId);
             ps.setString(2, fecha);
             ps.setString(3, hora);
             return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
             System.err.println("Error al registrar cita: " + e.getMessage());
             return false;
@@ -34,8 +38,9 @@ public class Cita {
     }
 
     public static ResultSet obtenerCitasConPaciente() {
-        String sql = "SELECT * FROM vista_citas";
+        String sql = GestorConsultas.obtenerConsulta("consulta.obtener_citas_con_paciente");
         ConexionBD conexionBD = new ConexionBD("project_prenatal");
+
         try {
             Connection conn = conexionBD.conectar();
             Statement st = conn.createStatement();
@@ -46,6 +51,7 @@ public class Cita {
         }
     }
 
+    // Getters y Setters (se mantienen igual)
     public int getId() {
         return id;
     }
@@ -77,5 +83,4 @@ public class Cita {
     public void setHora(String hora) {
         this.hora = hora;
     }
-
 }

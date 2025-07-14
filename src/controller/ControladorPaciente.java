@@ -1,21 +1,19 @@
 package controller;
 
-import base_datos.ConexionBD;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import base_datos.utilidades.GestorConsultas;
+import sql.ConexionBD;
+import java.sql.*;
 
 public class ControladorPaciente {
 
     public boolean existePaciente(int pacienteId) {
-        String sql = "SELECT id FROM pacientes WHERE id = ?";
+        String sql = GestorConsultas.obtenerConsulta("consulta.existe_paciente");
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, pacienteId);
             ResultSet rs = ps.executeQuery();
-            return rs.next(); // Devuelve true si encontró al paciente
+            return rs.next();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -24,7 +22,7 @@ public class ControladorPaciente {
     }
 
     public String obtenerNombrePaciente(int pacienteId) {
-        String sql = "SELECT nombre FROM pacientes WHERE id = ?";
+        String sql = GestorConsultas.obtenerConsulta("consulta.obtener_nombre_paciente");
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 

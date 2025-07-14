@@ -185,71 +185,126 @@ public class frmEditarRegistroCardiaco extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             String idTexto = txtId.getText().trim();
+
+            // Validación de campo vacío
             if (idTexto.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID.");
+                JOptionPane.showMessageDialog(this, "⚠️ Por favor, ingrese un ID", "Campo vacío", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             int id = Integer.parseInt(idTexto);
-            registroActual = RegistroCardiaco.buscarPorId(id);
 
-            if (registroActual != null) {
+            try {
+                // Buscar el registro
+                registroActual = RegistroCardiaco.buscarPorId(id);
+
+                if (registroActual != null) {
+                    // Mostrar detalles del registro encontrado
+                    String mensaje = "✅ Registro encontrado\n\n"
+                            + "ID: " + registroActual.getId() + "\n"
+                            + "Paciente ID: " + registroActual.getPacienteId() + "\n"
+                            + "Fecha: " + registroActual.getFecha() + "\n"
+                            + "Hora: " + registroActual.getHora();
+
+                    JOptionPane.showMessageDialog(this, mensaje, "Registro encontrado", JOptionPane.INFORMATION_MESSAGE);
+
+                    // Habilitar controles de edición
+                    cbxDato.setEnabled(true);
+                    txtEditarDato.setEnabled(true);
+                    btnEditar.setEnabled(true);
+                    btnEliminar.setEnabled(true);
+
+                    // Mostrar el valor actual del campo seleccionado
+                    mostrarValorActual();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "❌ No se encontró ningún registro con ID: " + id,
+                            "Registro no encontrado",
+                            JOptionPane.ERROR_MESSAGE);
+                    limpiarFormulario();
+                }
+
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this,
-                        "Registro encontrado para el paciente ID: " + registroActual.getPacienteId()
-                        + "\nFecha: " + registroActual.getFecha()
-                        + "\nHora: " + registroActual.getHora());
-
-                // Mostrar el valor actual del campo seleccionado
-                mostrarValorActual();
-
-                // Habilitar controles de edición
-                cbxDato.setEnabled(true);
-                txtEditarDato.setEnabled(true);
-                btnEditar.setEnabled(true);
-                btnEliminar.setEnabled(true);
-
-            } else {
-                JOptionPane.showMessageDialog(this, "Registro no encontrado con ID: " + id);
-                limpiarFormulario();
+                        "⚠️ Error al buscar registro: " + e.getMessage(),
+                        "Error en búsqueda",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID numérico válido.");
+            JOptionPane.showMessageDialog(this,
+                    "❌ Por favor, ingrese un ID numérico válido",
+                    "ID inválido",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         // TODO add your handling code here:
-        if (registroActual == null) {
-            JOptionPane.showMessageDialog(this, "Busque un registro primero.");
-            return;
-        }
+        try {
+            // Validar que hay un registro seleccionado
+            if (registroActual == null) {
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ Primero busque un registro para editar",
+                        "Sin registro",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-        String campo = (String) cbxDato.getSelectedItem();
-        String nuevoValor = txtEditarDato.getText().trim();
+            String campo = (String) cbxDato.getSelectedItem();
+            String nuevoValor = txtEditarDato.getText().trim();
 
-        if (nuevoValor.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, ingrese el nuevo valor.");
-            return;
-        }
+            // Validar campo vacío
+            if (nuevoValor.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ Por favor, ingrese el nuevo valor",
+                        "Campo vacío",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-        // Validar el tipo de dato según el campo
-        if (!validarTipoDato(campo, nuevoValor)) {
-            return;
-        }
+            // Validar el tipo de dato
+            if (!validarTipoDato(campo, nuevoValor)) {
+                return;
+            }
 
-        boolean exito = registroActual.editar(campo, nuevoValor);
+            // Confirmar la edición
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    this,
+                    "¿Está seguro de actualizar el campo " + campo + " a " + nuevoValor + "?",
+                    "Confirmar edición",
+                    JOptionPane.YES_NO_OPTION);
 
-        if (exito) {
-            JOptionPane.showMessageDialog(this, "Registro actualizado correctamente.");
-            // Refrescar el registro actual
-            registroActual = RegistroCardiaco.buscarPorId(registroActual.getId());
-            // Actualizar la tabla
-            btnVerDetallesActionPerformed(evt);
-            // Limpiar el campo de edición
-            txtEditarDato.setText("");
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo actualizar el registro. Verifique los datos.");
+            if (confirmacion != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            // Ejecutar la edición
+            boolean exito = registroActual.editar(campo, nuevoValor);
+
+            if (exito) {
+                JOptionPane.showMessageDialog(this,
+                        "✅ Registro actualizado correctamente",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                // Refrescar los datos
+                registroActual = RegistroCardiaco.buscarPorId(registroActual.getId());
+                btnVerDetallesActionPerformed(evt);
+                txtEditarDato.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "❌ No se pudo actualizar el registro",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "⚠️ Error al editar: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }//GEN-LAST:event_btnEditarActionPerformed
 
@@ -366,40 +421,96 @@ public class frmEditarRegistroCardiaco extends javax.swing.JFrame {
             switch (campo) {
                 case "frecuencia_cardiaca":
                 case "frecuencia_respiratoria":
+                    int frecuencia = Integer.parseInt(valor);
+                    if (frecuencia <= 0 || frecuencia > 300) {
+                        JOptionPane.showMessageDialog(this,
+                                "La frecuencia debe estar entre 1 y 300",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }
+                    break;
+
                 case "saturacion_oxigeno":
-                    int intVal = Integer.parseInt(valor);
-                    if (intVal < 0) {
-                        JOptionPane.showMessageDialog(this, "El valor no puede ser negativo.");
+                    int saturacion = Integer.parseInt(valor);
+                    if (saturacion < 70 || saturacion > 100) {
+                        JOptionPane.showMessageDialog(this,
+                                "La saturación debe estar entre 70 y 100",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
                         return false;
                     }
                     break;
+
                 case "temperatura":
+                    double temp = Double.parseDouble(valor);
+                    if (temp < 30 || temp > 45) {
+                        JOptionPane.showMessageDialog(this,
+                                "La temperatura debe estar entre 30°C y 45°C",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }
+                    break;
+
                 case "peso":
+                    double peso = Double.parseDouble(valor);
+                    if (peso <= 0 || peso > 300) {
+                        JOptionPane.showMessageDialog(this,
+                                "El peso debe estar entre 0.1 y 300 kg",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }
+                    break;
+
                 case "altura":
-                    double doubleVal = Double.parseDouble(valor);
-                    if (doubleVal < 0) {
-                        JOptionPane.showMessageDialog(this, "El valor no puede ser negativo.");
+                    double altura = Double.parseDouble(valor);
+                    if (altura <= 0 || altura > 3) {
+                        JOptionPane.showMessageDialog(this,
+                                "La altura debe estar entre 0.1 y 3 metros",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
                         return false;
                     }
                     break;
+
                 case "presion_arterial":
-                    // Validar formato de presión (ej: 120/80)
-                    if (!valor.matches("\\d+/\\d+")) {
-                        JOptionPane.showMessageDialog(this, "La presión arterial debe tener formato XXX/XX (ej: 120/80).");
+                    if (!valor.matches("\\d{2,3}/\\d{2,3}")) {
+                        JOptionPane.showMessageDialog(this,
+                                "Formato inválido. Use XXX/XX (ej: 120/80)",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
                         return false;
                     }
                     break;
+
                 case "fecha":
-                    // Validar formato de fecha (puedes ajustar según tu formato)
-                    if (!valor.matches("\\d{4}-\\d{2}-\\d{2}") && !valor.matches("\\d{2}/\\d{2}/\\d{4}")) {
-                        JOptionPane.showMessageDialog(this, "La fecha debe tener formato YYYY-MM-DD o DD/MM/YYYY.");
+                    if (!valor.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                        JOptionPane.showMessageDialog(this,
+                                "Formato inválido. Use YYYY-MM-DD",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }
+                    break;
+
+                case "hora":
+                    if (!valor.matches("\\d{2}:\\d{2}")) {
+                        JOptionPane.showMessageDialog(this,
+                                "Formato inválido. Use HH:MM (24h)",
+                                "Valor inválido",
+                                JOptionPane.WARNING_MESSAGE);
                         return false;
                     }
                     break;
             }
             return true;
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El valor ingresado no es válido para el campo " + campo + ".");
+            JOptionPane.showMessageDialog(this,
+                    "Valor numérico inválido para " + campo,
+                    "Error de formato",
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }

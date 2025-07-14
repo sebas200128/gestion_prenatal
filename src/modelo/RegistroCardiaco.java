@@ -1,6 +1,6 @@
 package modelo;
 
-import base_datos.ConexionBD;
+import sql.ConexionBD;
 import base_datos.utilidades.GestorConsultas;
 import java.sql.*;
 import java.util.ArrayList;
@@ -202,7 +202,8 @@ public class RegistroCardiaco {
     }
 
     public boolean editar(String campo, String nuevoValor) {
-        String sql = GestorConsultas.obtenerConsultaFormateada("consulta.editar_signo_vital", campo);
+        //String sql = GestorConsultas.obtenerConsultaFormateada("consulta.editar_signo_vital", campo);
+        String sql = GestorConsultas.obtenerConsultaFormateada("consulta.editar_signos", campo);
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 

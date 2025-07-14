@@ -131,7 +131,7 @@ public class frmEditarRegistroCardiaco extends javax.swing.JFrame {
         });
         getContentPane().add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 70, 40));
 
-        btnVerDetalles.setText("Ver Detalels");
+        btnVerDetalles.setText("Ver Detalles");
         btnVerDetalles.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnVerDetallesActionPerformed(evt);

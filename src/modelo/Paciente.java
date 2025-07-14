@@ -172,35 +172,60 @@ public class Paciente {
 
     // Método para eliminar paciente y sus registros relacionados
     public boolean eliminar() {
+        ConexionBD conexionBD = new ConexionBD("project_prenatal");
+        Connection conn = null;
         boolean exito = false;
-        String sqlEliminarRegistros = GestorConsultas.obtenerConsulta("consulta.eliminar_registros_paciente");
-        String sqlEliminarPaciente = GestorConsultas.obtenerConsulta("consulta.eliminar_paciente");
 
-        try (Connection conn = new ConexionBD("project_prenatal").conectar()) {
-            // Iniciar transacción
-            conn.setAutoCommit(false);
+        try {
+            conn = conexionBD.conectar();
+            conn.setAutoCommit(false); // Iniciar transacción
 
-            // Primero eliminar los registros relacionados
+            // 1. Primero eliminar los registros relacionados en signos_vitales
+            String sqlEliminarSignos = GestorConsultas.obtenerConsulta("consulta.eliminar_signos_por_paciente");
+            try (PreparedStatement pstmtSignos = conn.prepareStatement(sqlEliminarSignos)) {
+                pstmtSignos.setInt(1, this.id);
+                pstmtSignos.executeUpdate();
+            }
+
+            // 2. Luego eliminar los registros en registro_cambios
+            String sqlEliminarRegistros = GestorConsultas.obtenerConsulta("consulta.eliminar_registros_paciente");
             try (PreparedStatement pstmtRegistros = conn.prepareStatement(sqlEliminarRegistros)) {
                 pstmtRegistros.setInt(1, this.id);
                 pstmtRegistros.executeUpdate();
             }
 
-            // Luego eliminar el paciente
+            // 3. Finalmente eliminar el paciente
+            String sqlEliminarPaciente = GestorConsultas.obtenerConsulta("consulta.eliminar_paciente");
             try (PreparedStatement pstmtPaciente = conn.prepareStatement(sqlEliminarPaciente)) {
                 pstmtPaciente.setInt(1, this.id);
                 int filasAfectadas = pstmtPaciente.executeUpdate();
 
                 if (filasAfectadas > 0) {
-                    conn.commit();
+                    conn.commit(); // Confirmar transacción
                     exito = true;
                 } else {
-                    conn.rollback();
+                    conn.rollback(); // Revertir si no se eliminó
                 }
             }
         } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback(); // Revertir en caso de error
+                }
+            } catch (SQLException rollbackEx) {
+                System.err.println("Error al revertir transacción: " + rollbackEx.getMessage());
+            }
             System.err.println("Error al eliminar paciente: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Restaurar auto-commit
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al cerrar conexión: " + e.getMessage());
+            }
         }
         return exito;
     }

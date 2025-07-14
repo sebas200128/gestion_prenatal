@@ -12,17 +12,19 @@ public class ControladorPaciente {
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, pacienteId);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Devuelve true si encontró al paciente
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error al verificar existencia de paciente: " + e.getMessage());
             return false;
         }
     }
 
     public String obtenerNombrePaciente(int pacienteId) {
-        String sql = GestorConsultas.obtenerConsulta("consulta.obtener_nombre_paciente");
+        // Cambiar esto:
+        String sql = GestorConsultas.obtenerConsulta("consulta.buscar_paciente_por_id");
 
         try (Connection con = new ConexionBD("project_prenatal").conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -30,7 +32,7 @@ public class ControladorPaciente {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return rs.getString("nombre");
+                return rs.getString("nombre"); // Obtener el nombre del resultado completo
             }
 
         } catch (SQLException e) {

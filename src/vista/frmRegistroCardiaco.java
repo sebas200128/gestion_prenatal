@@ -179,28 +179,62 @@ public class frmRegistroCardiaco extends javax.swing.JFrame {
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         // TODO add your handling code here:
         try {
-            int pacienteId = Integer.parseInt(txtId.getText());
+            String idTexto = txtId.getText().trim();
+
+            if (idTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ Por favor ingrese un ID de paciente",
+                        "Campo vacío",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int pacienteId;
+            try {
+                pacienteId = Integer.parseInt(idTexto);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this,
+                        "❌ El ID debe ser un número válido",
+                        "Error de formato",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             ControladorPaciente controlador = new ControladorPaciente();
-            String nombrePaciente = controlador.obtenerNombrePaciente(pacienteId);
 
-            if (nombrePaciente != null) {
+            // Opción 1: Usando existePaciente()
+            if (!controlador.existePaciente(pacienteId)) {
                 JOptionPane.showMessageDialog(this,
-                        "Paciente encontrado: " + nombrePaciente + "\nPuede registrar los signos vitales.",
-                        "Paciente válido",
-                        JOptionPane.INFORMATION_MESSAGE);
-                // Aquí puedes habilitar los campos si estaban desactivados
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "No se encontró ningún paciente con ese ID.",
+                        "❌ No existe paciente con ID: " + pacienteId,
                         "Paciente no encontrado",
                         JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        } catch (NumberFormatException e) {
+
+            // Opción 2: Alternativa sin usar existePaciente()
+            String nombrePaciente = controlador.obtenerNombrePaciente(pacienteId);
+            if (nombrePaciente == null) {
+                JOptionPane.showMessageDialog(this,
+                        "❌ No se encontró paciente con ID: " + pacienteId,
+                        "Paciente no encontrado",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             JOptionPane.showMessageDialog(this,
-                    "Ingrese un ID de paciente válido.",
-                    "Error de formato",
+                    "✅ Paciente encontrado: " + nombrePaciente,
+                    "Búsqueda exitosa",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Habilitar campos para registro
+            habilitarCamposRegistro(true);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "⚠️ Error inesperado: " + e.getMessage(),
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
@@ -215,6 +249,19 @@ public class frmRegistroCardiaco extends javax.swing.JFrame {
         txtPeso.setText("");
         txtAltura.setText("");
         txtObservaciones.setText("");
+    }
+
+    private void habilitarCamposRegistro(boolean habilitar) {
+        txtFecha.setEnabled(habilitar);
+        txtHora.setEnabled(habilitar);
+        txtFrecuenciaCardiaca.setEnabled(habilitar);
+        txtTemperatura.setEnabled(habilitar);
+        txtSaturacion.setEnabled(habilitar);
+        txtPeso.setEnabled(habilitar);
+        txtAltura.setEnabled(habilitar);
+        txtPresionArterial.setEnabled(habilitar);
+        txtObservaciones.setEnabled(habilitar);
+        btnRegistrar.setEnabled(habilitar);
     }
 
     /**

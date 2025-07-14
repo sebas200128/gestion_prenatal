@@ -102,7 +102,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="btnVerDetalles">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Ver Detalels"/>
+        <Property name="text" type="java.lang.String" value="Ver Detalles"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnVerDetallesActionPerformed"/>

@@ -242,54 +242,65 @@ public class frmEditarDatos extends javax.swing.JFrame {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
         try {
-            // Validar que el campo no esté vacío
             String idTexto = txtIdBuscar.getText().trim();
             if (idTexto.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID para buscar.", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ Por favor, ingrese un ID",
+                        "Campo vacío",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // Validar que sea un número válido
-            int id;
-            try {
-                id = Integer.parseInt(idTexto);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "El ID debe ser un número válido.", "Formato inválido", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Buscar el paciente
+            int id = Integer.parseInt(idTexto);
             Paciente paciente = Paciente.buscarPorId(id);
-            if (paciente != null) {
-                // Confirmar la eliminación
-                int confirmacion = JOptionPane.showConfirmDialog(
-                        this,
-                        "¿Está seguro de que desea eliminar el paciente: " + paciente.getNombre() + "?",
-                        "Confirmar eliminación",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE
-                );
 
-                if (confirmacion == JOptionPane.YES_OPTION) {
-                    // Eliminar el paciente de la base de datos
-                    boolean eliminado = paciente.eliminar();
-
-                    if (eliminado) {
-                        JOptionPane.showMessageDialog(this, "Paciente eliminado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                        limpiarCampos(); // Limpiar campos después de eliminar
-                        btnVerDetallesActionPerformed(evt); // Actualizar la tabla
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Error al eliminar el paciente. Inténtelo nuevamente.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Paciente no encontrado con ID: " + id, "Paciente no encontrado", JOptionPane.WARNING_MESSAGE);
+            if (paciente == null) {
+                JOptionPane.showMessageDialog(this,
+                        "❌ No se encontró paciente con ID: " + id,
+                        "Paciente no encontrado",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
+            // Confirmación de eliminación
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    this,
+                    "¿Está seguro de eliminar al paciente:\n"
+                    + "Nombre: " + paciente.getNombre() + "\n"
+                    + "ID: " + paciente.getId() + "\n\n"
+                    + "⚠️ Esta acción también eliminará todos sus registros médicos asociados",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                boolean eliminado = paciente.eliminar();
+
+                if (eliminado) {
+                    JOptionPane.showMessageDialog(this,
+                            "✅ Paciente eliminado exitosamente",
+                            "Éxito",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    limpiarCampos();
+                    btnVerDetallesActionPerformed(evt); // Actualizar tabla
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "❌ No se pudo eliminar el paciente",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this,
+                    "❌ ID inválido. Debe ser un número",
+                    "Error de formato",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            System.err.println("Error inesperado en btnEliminarActionPerformed: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "⚠️ Error inesperado: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Ocurrió un error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
